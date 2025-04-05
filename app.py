@@ -14,6 +14,13 @@ def initdb():
         return "Database and tables created successfully!"
     except Exception as e:
         return f"Error: {e}"
+    
+# Custom command to load the database
+@proj.cli.command("db-load")
+def db_load():
+    """Create tables in the database."""
+    create_table()
+    print("Database tables created successfully!")
 
 @proj.route('/showdata')
 def showdata():
