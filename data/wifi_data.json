@@ -1,0 +1,94 @@
+{
+    "GEC": [
+        {
+            "timestamp": "2025-04-07 11:25:48",
+            "download_speed": 53.73658451893446,
+            "upload_speed": 15.338296262362858,
+            "latency_ms": 106.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-07 11:25:59",
+            "download_speed": 36.96823237172447,
+            "upload_speed": 30.977359598012793,
+            "latency_ms": 52.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-07 11:38:38",
+            "download_speed": 49.28003848017163,
+            "upload_speed": 13.262619283515427,
+            "latency_ms": 53.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-07 11:40:13",
+            "download_speed": 51.61857690260471,
+            "upload_speed": 33.25958543333402,
+            "latency_ms": 75.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-07 11:41:47",
+            "download_speed": 49.36486687289765,
+            "upload_speed": 36.46828950942766,
+            "latency_ms": 88.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-07 11:43:20",
+            "download_speed": 48.15639614750882,
+            "upload_speed": 25.25906128475441,
+            "latency_ms": 91.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-07 11:44:53",
+            "download_speed": 40.46825500214563,
+            "upload_speed": 34.178588883744,
+            "latency_ms": 90.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-07 11:46:26",
+            "download_speed": 39.78957315871054,
+            "upload_speed": 35.12339067019825,
+            "latency_ms": 81.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-07 11:47:59",
+            "download_speed": 48.73303156477243,
+            "upload_speed": 35.69106419104587,
+            "latency_ms": 87.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-07 11:49:31",
+            "download_speed": 48.5973289290565,
+            "upload_speed": 21.977612790414863,
+            "latency_ms": 71.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        }
+    ]
+}
