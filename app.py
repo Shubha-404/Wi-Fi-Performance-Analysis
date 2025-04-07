@@ -1,30 +1,18 @@
-from flask import Flask
-from models import create_table
+from flask import Flask, redirect
+from dash_app import create_dash_app
 
-proj = Flask(__name__)
+app = Flask(__name__)
 
-@proj.route('/')
+# Initialize Dash app
+dash_app = create_dash_app(app)
+
+@app.route('/')
 def index():
-    return "Welcome to Wi-Fi Performance Analysis"
+    return redirect('/dashboard/')
 
-@proj.route('/initdb')
-def initdb():
-    try:
-        create_table()
-        return "Database and tables created successfully!"
-    except Exception as e:
-        return f"Error: {e}"
-    
-# Custom command to load the database
-@proj.cli.command("db-load")
-def db_load():
-    """Create tables in the database."""
-    create_table()
-    print("Database tables created successfully!")
-
-@proj.route('/showdata')
+@app.route('/showdata')
 def showdata():
     return "Data will display here"
 
 if __name__ == "__main__":
-    proj.run(debug=True)  # Enable debug mode
+    app.run(debug=True)  # Enable debug mode
