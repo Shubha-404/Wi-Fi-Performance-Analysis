@@ -1,9 +1,9 @@
+import json
+from datetime import datetime
 import speedtest
 import time
 import subprocess
 import re
-import json
-from datetime import datetime
 from threading import Event
 from Database.database import get_db_connection
 
@@ -47,7 +47,7 @@ def get_speed():
         return None, None
 
 # Function to write data to a JSON file
-def write_to_json_file(data, location, filename=r"data/wifi_data.json"):
+def write_to_json_file(download_speed, upload_speed, latency_ms, jitter_ms, packet_loss, rssi, location, position_x, position_y, filename=r"data/wifi_data.json"):
     try:
         try:
             with open(filename, 'r') as f:
@@ -55,9 +55,25 @@ def write_to_json_file(data, location, filename=r"data/wifi_data.json"):
         except (FileNotFoundError, json.JSONDecodeError):
             existing_data = {}
         
+        entry = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "location": {
+                "position[x]": position_x,
+                "position[y]": position_y,
+                "position[name]": location
+            },
+            "download_speed": download_speed,
+            "upload_speed": upload_speed,
+            "latency_ms": latency_ms,
+            "jitter_ms": jitter_ms,
+            "packet_loss": packet_loss,
+            "rssi": rssi
+        }
+        
         if location not in existing_data:
             existing_data[location] = []
-        existing_data[location].append(data)
+        
+        existing_data[location].append(entry)
         
         with open(filename, 'w') as f:
             json.dump(existing_data, f, indent=4)
@@ -96,6 +112,8 @@ def collect_and_store_data(location_name, position_x, position_y):
         rssi = get_rssi()
         
         if download_speed is not None and upload_speed is not None and latency is not None:
+            write_to_json_file(download_speed, upload_speed, latency, jitter, packet_loss, rssi, location_name, position_x, position_y)
+            
             data = {
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "download_speed": download_speed,
@@ -105,7 +123,6 @@ def collect_and_store_data(location_name, position_x, position_y):
                 "packet_loss": packet_loss,
                 "rssi": rssi
             }
-            write_to_json_file(data, location_name)
             store_data_in_db(location_name, position_x, position_y, data)
             print(f"Data saved at {datetime.now()} for {location_name}")
         
@@ -118,6 +135,3 @@ def start_collection(location_name, position_x, position_y):
 def stop_collection():
     stop_event.set()
     print("Data collection stopped.")
-
-# if __name__ == "__main__":
-#     start_collection("ECC", 67.123, -43.456)

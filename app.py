@@ -1,8 +1,16 @@
-from flask import Flask
+from flask import Flask, redirect
+from dash_app import create_dash_app
 from Database.models import create_table
 from src.main import start_collection, stop_collection
 
 proj = Flask(__name__)
+
+# Initialize Dash app
+dash_app = create_dash_app(proj)
+
+@proj.route('/')
+def dashboard():
+    return redirect('/dashboard/')
 
 @proj.route('/')
 def index():
