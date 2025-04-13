@@ -1,54 +1,58 @@
-from flask import Flask, redirect
+from flask import Flask, redirect, jsonify, request, render_template
+from threading import Thread
+from src.main import start_collection, stop_collection, stop_event
 from dash_app import create_dash_app
+from Database.database import get_db_connection
 
-from Database.models import create_table
-from src.main import start_collection, stop_collection
-
-# Initialize Flask app
 proj = Flask(__name__)
-
-# Mount Dash app onto Flask
 dash_app = create_dash_app(proj)
 
-# Route: Root → Redirect to dashboard (Graphs page by default)
+collection_thread = None  # Global thread reference
 
 @proj.route('/')
 def dashboard():
     return redirect('/dashboard/')
 
-# Route: Create database tables
-@proj.route('/initdb')
-def initdb():
-    try:
-        create_table()
-        return "✅ Database and tables created successfully!"
-    except Exception as e:
-        return f"❌ Error: {e}"
-
-# Custom CLI command to initialize DB
-@proj.cli.command("db-load")
-def db_load():
-    """Create tables in the database."""
-    create_table()
-    print("✅ Database tables created successfully!")
-
-# Route: Placeholder for raw data viewing (can enhance later)
 @proj.route('/showdata')
 def showdata():
-    return "📊 Data will display here"
+    try:
+        db = get_db_connection()
+        wifi_data_col = db["wifi_data"]
+        data = list(wifi_data_col.find({}, {"_id": 0}).sort("timestamp", -1).limit(100))
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
-# Route: Start data collection (uses dummy or real input)
-@proj.route('/startCollection')
-def startCollection():
-    start_collection("GEC", 7.123, 3.456)  # Update with dynamic params if needed
-    return "🚀 Data Collection Started"
 
-# Route: Stop data collection
-@proj.route('/stopCollection')
-def stopCollection():
-    stop_collection()
-    return "🛑 Data Collection Stopped"
+# ✅ Combined Start/Stop UI + Logic Route
+@proj.route('/collection', methods=['GET', 'POST'])
+def collection():
+    global collection_thread
+    message = ""
 
-# Main entry point
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'start':
+            if collection_thread and collection_thread.is_alive():
+                message = "⚠️ Data collection is already running!"
+            else:
+                stop_event.clear()
+                loc = [['ECC', 67.12, -43.45], ['GEC', 70.21, -40.31], ['SDB', 65.78, -42.5],
+                       ['FOODCOURT', 68.33, -41.25], ['LOUNGE', 69.0, -39.9]]
+                collection_thread = Thread(target=start_collection, args=(loc,))
+                collection_thread.start()
+                message = "🚀 Data Collection Started"
+        elif action == 'stop':
+            stop_collection()
+            if collection_thread and collection_thread.is_alive():
+                collection_thread.join(timeout=5)
+                message = "🛑 Data Collection Stopped"
+            else:
+                message = "⚠️ No active data collection to stop"
+
+    # Simple inline HTML for the buttons and message
+    return render_template("collection.html", message=message)
+
+# Run app
 if __name__ == "__main__":
     proj.run(debug=True)

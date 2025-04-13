@@ -47,16 +47,18 @@ def get_speed():
         return None, None
 
 # Function to write data to a JSON file
-def write_to_json_file(download_speed, upload_speed, latency_ms, jitter_ms, packet_loss, rssi, location, position_x, position_y, filename=r"data/wifi_data.json"):
+def write_to_json_file(download_speed, upload_speed, latency_ms, jitter_ms, packet_loss, rssi,
+                       location, position_x, position_y, run_no, filename=r"data/wifi_data.json"):
     try:
         try:
             with open(filename, 'r') as f:
                 existing_data = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             existing_data = {}
-        
+
         entry = {
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "run_no": run_no,
             "location": {
                 "position[x]": position_x,
                 "position[y]": position_y,
@@ -69,68 +71,119 @@ def write_to_json_file(download_speed, upload_speed, latency_ms, jitter_ms, pack
             "packet_loss": packet_loss,
             "rssi": rssi
         }
-        
+
         if location not in existing_data:
             existing_data[location] = []
-        
+
         existing_data[location].append(entry)
-        
+
         with open(filename, 'w') as f:
             json.dump(existing_data, f, indent=4)
     except Exception as e:
         print(f"Error writing to JSON file: {e}")
 
-# Function to store data in MySQL
+
+# Function to store data in MongoDB in nested format by location
 def store_data_in_db(location_name, position_x, position_y, data):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
     try:
-        cursor.execute("""
-            INSERT INTO positions (position_name, position_x, position_y)
-            VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE position_x = %s, position_y = %s
-        """, (location_name, position_x, position_y, position_x, position_y))
-        
-        cursor.execute("""
-            INSERT INTO wifi_data (timestamp, position_name, download_speed, upload_speed, latency_ms, jitter_ms, packet_loss, rssi)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """, (data['timestamp'], location_name, data['download_speed'], data['upload_speed'], data['latency_ms'], data['jitter_ms'], data['packet_loss'], data['rssi']))
-        
-        conn.commit()
+        db = get_db_connection()
+        wifi_data_col = db["wifi_data"]
+
+        # Prepare new entry
+        new_entry = {
+            "timestamp": data['timestamp'],
+            "run_no": data['run_no'],
+            "location": {
+                "position[x]": position_x,
+                "position[y]": position_y,
+                "position[name]": location_name
+            },
+            "download_speed": data['download_speed'],
+            "upload_speed": data['upload_speed'],
+            "latency_ms": data['latency_ms'],
+            "jitter_ms": data['jitter_ms'],
+            "packet_loss": data['packet_loss'],
+            "rssi": data['rssi']
+        }
+
+        # Upsert by location_name: Push the new run data into the array
+        wifi_data_col.update_one(
+            {"_id": location_name},
+            {"$push": {location_name: new_entry}},
+            upsert=True
+        )
+
+        print(f"✅ Data stored under {location_name}")
     except Exception as e:
-        print(f"Error storing data in database: {e}")
-    finally:
-        cursor.close()
-        conn.close()
+        print(f"❌ Error storing data in MongoDB: {e}")
 
 # Main function to collect and store WiFi data
-def collect_and_store_data(location_name, position_x, position_y):
-    stop_event.clear()
-    while not stop_event.is_set():
+def collect_and_store_data(location_list, run_no):
+    for location in location_list:
+        if stop_event.is_set():
+            print("Data collection interrupted.")
+            break
+
+        if len(location) != 3:
+            print("Invalid location format. Skipping:", location)
+            continue
+
+        location_name, position_x, position_y = location
+
         download_speed, upload_speed = get_speed()
         latency, jitter, packet_loss = get_ping_stats()
         rssi = get_rssi()
-        
-        if download_speed is not None and upload_speed is not None and latency is not None:
-            write_to_json_file(download_speed, upload_speed, latency, jitter, packet_loss, rssi, location_name, position_x, position_y)
-            
+
+        if all(val is not None for val in [download_speed, upload_speed, latency]):
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            write_to_json_file(
+                download_speed, upload_speed, latency, jitter, packet_loss,
+                rssi, location_name, position_x, position_y, run_no=run_no
+            )
+
             data = {
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "timestamp": timestamp,
                 "download_speed": download_speed,
                 "upload_speed": upload_speed,
                 "latency_ms": latency,
                 "jitter_ms": jitter,
                 "packet_loss": packet_loss,
-                "rssi": rssi
+                "rssi": rssi,
+                "run_no": run_no
             }
-            store_data_in_db(location_name, position_x, position_y, data)
-            print(f"Data saved at {datetime.now()} for {location_name}")
-        
-        time.sleep(60)
 
-def start_collection(location_name, position_x, position_y):
-    print("Data collection started.")
-    collect_and_store_data(location_name, position_x, position_y)
+            store_data_in_db(location_name, position_x, position_y, data)
+            print(f"[Run {run_no}] Data saved at {timestamp} for {location_name}")
+
+        time.sleep(5)
+
+
+def get_next_run_no():
+    try:
+        db = get_db_connection()
+        wifi_data_col = db["wifi_data"]
+
+        max_run = 0
+        for doc in wifi_data_col.find():
+            key = doc["_id"]
+            if isinstance(doc.get(key), list):
+                for entry in doc[key]:
+                    if "run_no" in entry:
+                        max_run = max(max_run, entry["run_no"])
+
+        return max_run + 1
+    except Exception as e:
+        print(f"Error fetching run_no: {e}")
+        return 1
+
+
+
+def start_collection(location_list):
+    run_no = get_next_run_no()
+    print(f"Starting data collection for Run {run_no} across {len(location_list)} locations.")
+    collect_and_store_data(location_list, run_no)
+
 
 def stop_collection():
     stop_event.set()

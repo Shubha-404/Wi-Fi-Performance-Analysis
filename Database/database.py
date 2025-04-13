@@ -1,6 +1,7 @@
-import mysql.connector
+from pymongo import MongoClient
 from Database.config import DB_CONFIG
 
 def get_db_connection():
-    conn = mysql.connector.connect(**DB_CONFIG)
-    return conn
+    client = MongoClient(DB_CONFIG["host"], DB_CONFIG["port"])
+    db = client[DB_CONFIG["database"]]
+    return db
