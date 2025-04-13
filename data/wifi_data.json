@@ -335,6 +335,21 @@
             "jitter_ms": 0.0,
             "packet_loss": 0.0,
             "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 18:27:10",
+            "run_no": 3,
+            "location": {
+                "position[x]": 68.33,
+                "position[y]": -41.25,
+                "position[name]": "FOODCOURT"
+            },
+            "download_speed": 42.21160827638984,
+            "upload_speed": 6.418729724144153,
+            "latency_ms": 115.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
         }
     ],
     "LOUNGE": [
