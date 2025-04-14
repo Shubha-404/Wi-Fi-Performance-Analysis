@@ -8,15 +8,6 @@ from modules.utils import get_pixel_coords
 import dash_bootstrap_components as dbc
 from datetime import datetime
 
-parameter_labels = {
-    'download_speed': 'Download Speed (Mbps)',
-    'upload_speed': 'Upload Speed (Mbps)',
-    'latency_ms': 'Latency (ms)',
-    'jitter_ms': 'Jitter (ms)',
-    'packet_loss': 'Packet Loss (%)',
-    'rssi': 'RSSI (dBm)'
-}
-
 
 def register_callbacks(dash_app, colors):
 
@@ -219,93 +210,69 @@ def register_callbacks(dash_app, colors):
     Input('aggregation-level', 'value')
 
 )
+
     def update_trend_timeseries(location, parameters, selected_hour, smoothing_toggle, aggregation_level):
         df = load_wifi_data()
         if df.empty or not location:
             return {}
 
         df['hour'] = pd.to_datetime(df['timestamp']).dt.hour.astype(int)
-        filtered = df[df['location'] == location]
 
-        # Filter by hour range
+        filtered = df[df['location'] == location]
+        
+
+        # selected_hour is now a list like [start_hour, end_hour]
+        # Make sure selected_hour has a valid range before filtering
         if selected_hour and isinstance(selected_hour, list) and len(selected_hour) == 2:
             filtered = filtered[
-                (filtered['hour'] >= selected_hour[0]) & (filtered['hour'] <= selected_hour[1])
+                (filtered['hour'] >= selected_hour[0]) &
+                (filtered['hour'] <= selected_hour[1])
             ]
 
-        # === Visualization ===
-        if len(parameters) == 1:
-            # One parameter: time vs value (scatter)
-            fig = px.scatter(
-                filtered,
-                x='timestamp',
-                y=parameters[0],
-                color='run_no' if 'run_no' in filtered.columns else None,
-                title=f"{parameter_labels[parameters[0]]} Over Time - {location}",
-                hover_data=['timestamp', 'hour'] if 'hour' in filtered.columns else ['timestamp'],
-                labels={'run_no': 'Run'} if 'run_no' in filtered.columns else {}
-            )
-            fig.update_traces(marker=dict(size=20))
-            fig.update_layout(
-                height=500,
-                width=None,
-                plot_bgcolor='white',
-                paper_bgcolor='white',
-                font={'color': colors['text']},
-                margin=dict(l=60, r=20, t=50, b=50),
-                xaxis_tickangle=-45
-            )
+        # Smoothing logic
+        if 'smooth' in smoothing_toggle:
+            filtered[parameter] = filtered[parameter].rolling(window=3, min_periods=1).mean()
 
-        elif len(parameters) == 2:
-            # 2-param comparison as line graph
-            fig = go.Figure()
-            
-            # Add a trace for the first parameter
-            fig.add_trace(go.Scatter(
-                x=filtered[parameters[0]],
-                y=filtered[parameters[1]],
-                mode='lines',  # Use 'lines' for a line graph without markers
-                name=f"{parameter_labels[parameters[0]]} vs {parameter_labels[parameters[1]]}",
-                line=dict(width=2)  # Customize line width if needed
-            ))
-            
-            fig.update_layout(
-                title=f"Comparison: {parameter_labels[parameters[0]]} vs {parameter_labels[parameters[1]]}",
-                xaxis_title=parameter_labels[parameters[0]],
-                yaxis_title=parameter_labels[parameters[1]],
-                width=None,
-                height=500
-            )
+        # Apply aggregation
+        if aggregation_level == 'run':
+            filtered = filtered.groupby('run_no').agg({
+                parameter: 'mean',
+                'timestamp': 'first'
+            }).reset_index()
+        elif aggregation_level == 'day':
+            filtered['day'] = pd.to_datetime(filtered['timestamp']).dt.date
+            filtered = filtered.groupby('day').agg({
+                parameter: 'mean',
+                'timestamp': 'first'
+            }).reset_index()
 
-        else:
-            # More than two parameters: grouped bar chart over time
-            fig = go.Figure()
-            for param in parameters:
-                fig.add_trace(go.Bar(
-                    x=filtered['timestamp'],
-                    y=filtered[param],
-                    name=parameter_labels[param]
-                ))
+            print("Filtered rows:", len(filtered))
+            print("Aggregation Level:", aggregation_level)
+            print("Hour Range:", selected_hour)
+            print("Location:", location)
+            print("Columns:", filtered.columns)
 
-            # Dynamic width for bar charts based on data
-            num_timestamps = filtered['timestamp'].nunique()
-            dynamic_width = max(1320, num_timestamps * len(parameters) * 25)
+        fig = px.scatter(
+            filtered,
+            x='timestamp',
+            y=parameter,
+            color='run_no',
+            title=f"{parameter.replace('_', ' ').title()} Over Time - {location}",
+            hover_data=['run_no', 'timestamp', 'hour'],
+            labels={'run_no': 'Run'}
+        )
 
-            fig.update_layout(
-                title=f"Grouped Bar Chart: {', '.join([parameter_labels[p] for p in parameters])} - {location}",
-                xaxis_title="Timestamp",
-                yaxis_title="Value",
-                barmode='group',
-                height=500,
-                width=dynamic_width,
-                plot_bgcolor='white',
-                paper_bgcolor='white',
-                font={'color': colors['text']},
-                margin=dict(l=60, r=20, t=50, b=50),
-                xaxis_tickangle=-45
-            )
-
+        
+        fig.update_layout(
+            plot_bgcolor='white',
+            paper_bgcolor='white',
+            font={'color': colors['text']},
+            margin=dict(l=60, r=20, t=50, b=50),
+            height=400
+        )
+        fig.update_traces(marker=dict(size=12))  
         return fig
+
 
 
     @dash_app.callback(
