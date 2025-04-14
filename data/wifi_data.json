@@ -1,0 +1,537 @@
+{
+    "ECC": [
+        {
+            "timestamp": "2025-04-13 16:56:39",
+            "run_no": 1,
+            "location": {
+                "position[x]": 67.12,
+                "position[y]": -43.45,
+                "position[name]": "ECC"
+            },
+            "download_speed": 58.524650638919994,
+            "upload_speed": 10.862747694695992,
+            "latency_ms": 63.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:09:14",
+            "run_no": 2,
+            "location": {
+                "position[x]": 67.12,
+                "position[y]": -43.45,
+                "position[name]": "ECC"
+            },
+            "download_speed": 13.730224820411888,
+            "upload_speed": 7.418467720024432,
+            "latency_ms": 74.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:13:18",
+            "run_no": 3,
+            "location": {
+                "position[x]": 67.12,
+                "position[y]": -43.45,
+                "position[name]": "ECC"
+            },
+            "download_speed": 62.94961196978818,
+            "upload_speed": 8.07305780271701,
+            "latency_ms": 99.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:21:04",
+            "run_no": 4,
+            "location": {
+                "position[x]": 67.12,
+                "position[y]": -43.45,
+                "position[name]": "ECC"
+            },
+            "download_speed": 54.40374483525054,
+            "upload_speed": 11.559514312112917,
+            "latency_ms": 76.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:37:17",
+            "run_no": 5,
+            "location": {
+                "position[x]": 67.12,
+                "position[y]": -43.45,
+                "position[name]": "ECC"
+            },
+            "download_speed": 59.53782960172932,
+            "upload_speed": 6.201246159186059,
+            "latency_ms": 59.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:50:53",
+            "run_no": 1,
+            "location": {
+                "position[x]": 67.12,
+                "position[y]": -43.45,
+                "position[name]": "ECC"
+            },
+            "download_speed": 30.50582339775768,
+            "upload_speed": 5.765469235090888,
+            "latency_ms": 76.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:56:34",
+            "run_no": 2,
+            "location": {
+                "position[x]": 67.12,
+                "position[y]": -43.45,
+                "position[name]": "ECC"
+            },
+            "download_speed": 12.614374585486207,
+            "upload_speed": 7.863803830149303,
+            "latency_ms": 55.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 18:23:48",
+            "run_no": 3,
+            "location": {
+                "position[x]": 67.12,
+                "position[y]": -43.45,
+                "position[name]": "ECC"
+            },
+            "download_speed": 39.91105727564819,
+            "upload_speed": 6.32202061860091,
+            "latency_ms": 63.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-14 00:46:33",
+            "run_no": 1,
+            "location": {
+                "position[x]": 67.12,
+                "position[y]": -43.45,
+                "position[name]": "ECC"
+            },
+            "download_speed": 135.3032733359891,
+            "upload_speed": 13.02677445210496,
+            "latency_ms": 56.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 99
+        },
+        {
+            "timestamp": "2025-04-14 00:50:20",
+            "run_no": 2,
+            "location": {
+                "position[x]": 67.12,
+                "position[y]": -43.45,
+                "position[name]": "ECC"
+            },
+            "download_speed": 154.71640072552518,
+            "upload_speed": 7.675453719449491,
+            "latency_ms": 53.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 99
+        }
+    ],
+    "GEC": [
+        {
+            "timestamp": "2025-04-13 16:57:46",
+            "run_no": 1,
+            "location": {
+                "position[x]": 70.21,
+                "position[y]": -40.31,
+                "position[name]": "GEC"
+            },
+            "download_speed": 56.576320066803,
+            "upload_speed": 11.055448976404605,
+            "latency_ms": 61.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:10:22",
+            "run_no": 2,
+            "location": {
+                "position[x]": 70.21,
+                "position[y]": -40.31,
+                "position[name]": "GEC"
+            },
+            "download_speed": 14.556966347184119,
+            "upload_speed": 7.715387942314933,
+            "latency_ms": 83.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:14:27",
+            "run_no": 3,
+            "location": {
+                "position[x]": 70.21,
+                "position[y]": -40.31,
+                "position[name]": "GEC"
+            },
+            "download_speed": 31.465921308033202,
+            "upload_speed": 7.8786527643860405,
+            "latency_ms": 82.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:52:01",
+            "run_no": 1,
+            "location": {
+                "position[x]": 70.21,
+                "position[y]": -40.31,
+                "position[name]": "GEC"
+            },
+            "download_speed": 32.54378151597096,
+            "upload_speed": 4.440971624319312,
+            "latency_ms": 95.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:57:41",
+            "run_no": 2,
+            "location": {
+                "position[x]": 70.21,
+                "position[y]": -40.31,
+                "position[name]": "GEC"
+            },
+            "download_speed": 17.280877101752335,
+            "upload_speed": 8.957369147014822,
+            "latency_ms": 71.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 18:24:55",
+            "run_no": 3,
+            "location": {
+                "position[x]": 70.21,
+                "position[y]": -40.31,
+                "position[name]": "GEC"
+            },
+            "download_speed": 37.95747719155164,
+            "upload_speed": 8.743682365109402,
+            "latency_ms": 83.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-14 00:47:11",
+            "run_no": 1,
+            "location": {
+                "position[x]": 70.21,
+                "position[y]": -40.31,
+                "position[name]": "GEC"
+            },
+            "download_speed": 170.7766147365352,
+            "upload_speed": 17.987374762373193,
+            "latency_ms": 61.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 91
+        },
+        {
+            "timestamp": "2025-04-14 00:50:58",
+            "run_no": 2,
+            "location": {
+                "position[x]": 70.21,
+                "position[y]": -40.31,
+                "position[name]": "GEC"
+            },
+            "download_speed": 101.6275896829918,
+            "upload_speed": 7.6954560510801775,
+            "latency_ms": 52.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 99
+        }
+    ],
+    "SDB": [
+        {
+            "timestamp": "2025-04-13 16:58:53",
+            "run_no": 1,
+            "location": {
+                "position[x]": 65.78,
+                "position[y]": -42.5,
+                "position[name]": "SDB"
+            },
+            "download_speed": 52.78277669062625,
+            "upload_speed": 11.96969103004086,
+            "latency_ms": 57.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:15:33",
+            "run_no": 3,
+            "location": {
+                "position[x]": 65.78,
+                "position[y]": -42.5,
+                "position[name]": "SDB"
+            },
+            "download_speed": 61.98198684552165,
+            "upload_speed": 6.243753934717186,
+            "latency_ms": 66.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:53:09",
+            "run_no": 1,
+            "location": {
+                "position[x]": 65.78,
+                "position[y]": -42.5,
+                "position[name]": "SDB"
+            },
+            "download_speed": 24.538123659659277,
+            "upload_speed": 7.567404337848597,
+            "latency_ms": 74.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:58:48",
+            "run_no": 2,
+            "location": {
+                "position[x]": 65.78,
+                "position[y]": -42.5,
+                "position[name]": "SDB"
+            },
+            "download_speed": 18.926632176603686,
+            "upload_speed": 9.823020432573097,
+            "latency_ms": 68.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 18:26:02",
+            "run_no": 3,
+            "location": {
+                "position[x]": 65.78,
+                "position[y]": -42.5,
+                "position[name]": "SDB"
+            },
+            "download_speed": 40.6815875940232,
+            "upload_speed": 8.076426600701833,
+            "latency_ms": 71.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-14 00:47:48",
+            "run_no": 1,
+            "location": {
+                "position[x]": 65.78,
+                "position[y]": -42.5,
+                "position[name]": "SDB"
+            },
+            "download_speed": 165.26758883675237,
+            "upload_speed": 18.676614511686793,
+            "latency_ms": 50.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 91
+        },
+        {
+            "timestamp": "2025-04-14 00:51:36",
+            "run_no": 2,
+            "location": {
+                "position[x]": 65.78,
+                "position[y]": -42.5,
+                "position[name]": "SDB"
+            },
+            "download_speed": 159.2131850333394,
+            "upload_speed": 18.385894900183292,
+            "latency_ms": 56.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 99
+        }
+    ],
+    "FOODCOURT": [
+        {
+            "timestamp": "2025-04-13 17:16:41",
+            "run_no": 3,
+            "location": {
+                "position[x]": 68.33,
+                "position[y]": -41.25,
+                "position[name]": "FOODCOURT"
+            },
+            "download_speed": 55.21913034950248,
+            "upload_speed": 9.721450299292794,
+            "latency_ms": 71.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:54:17",
+            "run_no": 1,
+            "location": {
+                "position[x]": 68.33,
+                "position[y]": -41.25,
+                "position[name]": "FOODCOURT"
+            },
+            "download_speed": 36.62694645537133,
+            "upload_speed": 6.044235309937613,
+            "latency_ms": 66.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:59:56",
+            "run_no": 2,
+            "location": {
+                "position[x]": 68.33,
+                "position[y]": -41.25,
+                "position[name]": "FOODCOURT"
+            },
+            "download_speed": 18.698267322393125,
+            "upload_speed": 8.875546458786392,
+            "latency_ms": 64.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 18:27:10",
+            "run_no": 3,
+            "location": {
+                "position[x]": 68.33,
+                "position[y]": -41.25,
+                "position[name]": "FOODCOURT"
+            },
+            "download_speed": 42.21160827638984,
+            "upload_speed": 6.418729724144153,
+            "latency_ms": 115.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-14 00:48:26",
+            "run_no": 1,
+            "location": {
+                "position[x]": 68.33,
+                "position[y]": -41.25,
+                "position[name]": "FOODCOURT"
+            },
+            "download_speed": 119.19526984411249,
+            "upload_speed": 10.657384809428477,
+            "latency_ms": 51.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 95
+        },
+        {
+            "timestamp": "2025-04-14 00:52:14",
+            "run_no": 2,
+            "location": {
+                "position[x]": 68.33,
+                "position[y]": -41.25,
+                "position[name]": "FOODCOURT"
+            },
+            "download_speed": 134.30005048048227,
+            "upload_speed": 12.529402773822358,
+            "latency_ms": 62.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 92
+        }
+    ],
+    "LOUNGE": [
+        {
+            "timestamp": "2025-04-13 17:17:48",
+            "run_no": 3,
+            "location": {
+                "position[x]": 69.0,
+                "position[y]": -39.9,
+                "position[name]": "LOUNGE"
+            },
+            "download_speed": 57.857261550860805,
+            "upload_speed": 10.09837789461792,
+            "latency_ms": 80.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-13 17:55:26",
+            "run_no": 1,
+            "location": {
+                "position[x]": 69.0,
+                "position[y]": -39.9,
+                "position[name]": "LOUNGE"
+            },
+            "download_speed": 17.846857620208468,
+            "upload_speed": 6.037534737438782,
+            "latency_ms": 62.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
+        },
+        {
+            "timestamp": "2025-04-14 00:49:04",
+            "run_no": 1,
+            "location": {
+                "position[x]": 69.0,
+                "position[y]": -39.9,
+                "position[name]": "LOUNGE"
+            },
+            "download_speed": 116.97027343255401,
+            "upload_speed": 11.859686841125352,
+            "latency_ms": 58.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 99
+        },
+        {
+            "timestamp": "2025-04-14 00:52:52",
+            "run_no": 2,
+            "location": {
+                "position[x]": 69.0,
+                "position[y]": -39.9,
+                "position[name]": "LOUNGE"
+            },
+            "download_speed": 74.0530752729143,
+            "upload_speed": 25.034248336158207,
+            "latency_ms": 54.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 86
+        }
+    ]
+}

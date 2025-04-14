@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WiFi Data Collection</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #74ebd5, #9face6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h2 {
+            font-size: 32px;
+            color: #fff;
+            margin-bottom: 40px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        form {
+            background: #ffffffcc;
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        button {
+            padding: 12px 30px;
+            margin: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        button[name="action"][value="start"] {
+            background-color: #28a745;
+            color: white;
+        }
+
+        button[name="action"][value="start"]:hover {
+            background-color: #218838;
+        }
+
+        button[name="action"][value="stop"] {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        button[name="action"][value="stop"]:hover {
+            background-color: #c82333;
+        }
+
+        .msg {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h2>WiFi Data Collection Control</h2>
+    <form method="POST">
+        <button name="action" value="start">Start Collection</button>
+        <button name="action" value="stop">Stop Collection</button>
+    </form>
+    {% if message %}
+        <div class="msg">{{ message }}</div>
+    {% endif %}
+</body>
+</html>
