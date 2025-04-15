@@ -7,6 +7,8 @@ import plotly.graph_objects as go
 from modules.utils import get_pixel_coords
 import dash_bootstrap_components as dbc
 from datetime import datetime
+from plotly.subplots import make_subplots
+import dash
 
 parameter_labels = {
     'download_speed': 'Download Speed (Mbps)',
@@ -115,76 +117,88 @@ def register_callbacks(dash_app, colors):
             hours = ['All Hours'] + sorted(df['hour'].unique())
 
             return html.Div([
-            html.Div([
                 html.Div([
-                    html.Div("Location", className='filter-label'),
-                    dcc.Dropdown(
-                        id='trends-location',
-                        options=[{'label': loc, 'value': loc} for loc in locations],
-                        value=locations[0],
-                        clearable=False
-                    )
-                ], className='filter-item'),
+                    html.Div([
+                        html.Div("Location", className='filter-label'),
+                        html.Div([
+                            dbc.Button("◀️", id='prev-location-btn', color='primary', outline=True, size='sm'),
+                            html.Div(
+                                locations[0] if locations else '',
+                                id='current-location-display',
+                                style={
+                                    'padding': '0 15px',
+                                    'color': 'white',
+                                    'fontWeight': 'bold',
+                                    'display': 'inline-block'
+                                }
+                            ),
 
-                html.Div([
-                    html.Div("Parameters", className='filter-label'),
-                    dcc.Checklist(
-                        id='trends-parameters',
-                        options=[{'label': parameter_labels[p], 'value': p} for p in parameters],
-                        value=['download_speed'],  # default one selected
-                        inline=True,
-                        inputStyle={'marginRight': '5px'}
-                    )
-                ], className='filter-item'),
+                            dbc.Button("▶️", id='next-location-btn', color='primary', outline=True, size='sm'),
+                            dcc.Store(id='location-index', data=0,storage_type='session'),
+                            dcc.Input(id='trends-location', type='hidden', value=locations[0] if locations else '', debounce=True)
+                        ], style={'display': 'flex', 'alignItems': 'center'})
+                    ], className='filter-item'),
 
+                    html.Div([
+                        html.Div("Parameters", className='filter-label'),
+                        dcc.Checklist(
+                            id='trends-parameters',
+                            options=[{'label': parameter_labels[p], 'value': p} for p in parameters],
+                            value=['download_speed'],  # default one selected
+                            inline=True,
+                            inputStyle={'marginRight': '5px'},
+                            style={'color': 'white'}
+                        )
+                    ], className='filter-item'),
 
-                html.Div([
-                    html.Div("Smoothing", className='filter-label'),
-                    dcc.Checklist(
-                        id='smoothing-toggle',
-                        options=[{'label': '3-run Moving Avg', 'value': 'smooth'}],
-                        value=[],
-                        inputStyle={'marginRight': '10px'}
-                    )
-                ], className='filter-item'),
+                    html.Div([
+                        html.Div("Smoothing", className='filter-label'),
+                        dcc.Checklist(
+                            id='smoothing-toggle',
+                            options=[{'label': '3-run Moving Avg', 'value': 'smooth'}],
+                            value=[],
+                            inputStyle={'marginRight': '10px'},
+                            style={'color': 'white'}
+                        )
+                    ], className='filter-item'),
 
-                html.Div([
-                    html.Div("Aggregation Level", className='filter-label'),
-                    dcc.Dropdown(
-                        id='aggregation-level',
-                        options=[
-                            {'label': 'Raw', 'value': 'raw'},
-                            {'label': 'Per Run', 'value': 'run'},
-                            {'label': 'Per Day', 'value': 'day'}
-                        ],
-                        value='raw',
-                        clearable=False
-                    )
-                ], className='filter-item'),
+                    html.Div([
+                        html.Div("Aggregation Level", className='filter-label'),
+                        dcc.Dropdown(
+                            id='aggregation-level',
+                            options=[
+                                {'label': 'Raw', 'value': 'raw'},
+                                {'label': 'Per Run', 'value': 'run'},
+                                {'label': 'Per Day', 'value': 'day'}
+                            ],
+                            value='raw',
+                            clearable=False
+                        )
+                    ], className='filter-item'),
 
+                    html.Div([
+                        html.Div("Hour Range", className='filter-label'),
+                        dcc.RangeSlider(
+                            id='trends-hour',
+                            min=0,
+                            max=23,
+                            step=1,
+                            marks={i: str(i) for i in range(0, 24, 2)},
+                            value=[0, 23]
+                        )
+                    ], className='filter-item'),
 
-                html.Div([
-                    html.Div("Hour Range", className='filter-label'),
-                    dcc.RangeSlider(
-                        id='trends-hour',
-                        min=0,
-                        max=23,
-                        step=1,
-                        marks={i: str(i) for i in range(0, 24, 2)},
-                        value=[0, 23]
-                    )
-                ], className='filter-item'),
-                
-            ], style={
-                'display': 'flex',
-                'gap': '20px',
-                'marginBottom': '20px',
-                'flexWrap': 'wrap'
-            }),
+                ], style={
+                    'display': 'flex',
+                    'gap': '20px',
+                    'marginBottom': '20px',
+                    'flexWrap': 'wrap'
+                }),
 
-            dcc.Graph(id='trends-time-series', className='graph-container'),
-            html.Div(id='hourly-bar-wrapper')  # We'll dynamically show/hide this
-        ])
+                dcc.Graph(id='trends-time-series', className='graph-container'),
+                html.Div(id='hourly-bar-wrapper')  # We'll dynamically show/hide this
+            ])
+
 
         elif tab == 'heatmap':
             df = load_wifi_data()
@@ -208,7 +222,37 @@ def register_callbacks(dash_app, colors):
             ])
         return html.Div("🚧 This section is under construction.")
     
-    
+
+    @dash_app.callback(
+    Output('location-index', 'data'),
+    Output('current-location-display', 'children'),
+    Output('trends-location', 'value'),  # to trigger dependent callbacks
+    Input('prev-location-btn', 'n_clicks'),
+    Input('next-location-btn', 'n_clicks'),
+    State('location-index', 'data'),
+    prevent_initial_call=True
+    )
+    def switch_location(prev_clicks, next_clicks, current_index):
+        ctx = dash.callback_context if hasattr(dash, 'callback_context') else dash.ctx
+        if not ctx.triggered:
+            return current_index, dash.no_update, dash.no_update
+
+        # Load location list
+        df = load_wifi_data()
+        locations = sorted(df['location'].unique())
+
+        if not locations:
+            return 0, "No locations", None
+
+        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        if triggered_id == 'prev-location-btn':
+            new_index = (current_index - 1) % len(locations)
+        else:
+            new_index = (current_index + 1) % len(locations)
+
+        new_location = locations[new_index]
+        return new_index, new_location, new_location
+        
     
     @dash_app.callback(
     Output('trends-time-series', 'figure'),
@@ -278,40 +322,74 @@ def register_callbacks(dash_app, colors):
             )
 
         else:
-            # More than two parameters: grouped bar chart over time
-            fig = go.Figure()
+            # More than two parameters: grouped bar chart + correlation heatmap in subplots
+            latest_runs = sorted(filtered['run_no'].unique())[-5:]
+            filtered_runs = filtered[filtered['run_no'].isin(latest_runs)]
+
+            # Compute correlation
+            corr_data = filtered_runs[parameters]
+            corr_matrix = corr_data.corr()
+
+            # Create subplot with 2 rows
+            fig = make_subplots(
+                rows=2, cols=1,
+                shared_xaxes=False,
+                subplot_titles=[
+                    f"Grouped Bar Chart (Last 5 Runs) - {location}",
+                    "Correlation Heatmap"
+                ],
+                row_heights=[0.5, 0.5],
+                vertical_spacing=0.15
+            )
+
+            # Add bar traces
             for param in parameters:
                 fig.add_trace(go.Bar(
-                    x=filtered['timestamp'],
-                    y=filtered[param],
+                    x=['Run ' + str(r) for r in filtered_runs['run_no']],
+                    y=filtered_runs[param],
                     name=parameter_labels[param]
-                ))
+                ), row=1, col=1)
 
-            # Dynamic width for bar charts based on data
-            num_timestamps = filtered['timestamp'].nunique()
-            dynamic_width = max(1320, num_timestamps * len(parameters) * 25)
+            # Add heatmap
+            fig.add_trace(go.Heatmap(
+                z=corr_matrix.values,
+                x=[parameter_labels[p] for p in parameters],
+                y=[parameter_labels[p] for p in parameters],
+                colorscale='Viridis',
+                colorbar=dict(title='Correlation')
+            ), row=2, col=1)
 
             fig.update_layout(
-                title=f"Grouped Bar Chart: {', '.join([parameter_labels[p] for p in parameters])} - {location}",
-                xaxis_title="Timestamp",
-                yaxis_title="Value",
+                height=800,
+                width=None,
                 barmode='group',
-                height=500,
-                width=dynamic_width,
                 plot_bgcolor='white',
                 paper_bgcolor='white',
                 font={'color': colors['text']},
                 margin=dict(l=60, r=20, t=50, b=50),
-                xaxis_tickangle=-45
+                xaxis_tickangle=-45,
+                showlegend=True,
+
+                # 🔥 Fix legend and colorbar position
+                legend=dict(
+                    orientation='h',
+                    yanchor='bottom',
+                    y=1.05,
+                    xanchor='center',
+                    x=0.5
+                ),
+                coloraxis_colorbar=dict(
+                    x=1.02  # pushes color scale slightly to the right
+                )
             )
 
+        # For 1 or 2 parameters, return a single figure
         return fig
-
 
     @dash_app.callback(
     Output('hourly-bar-wrapper', 'children'),
     Input('trends-location', 'value'),
-    Input('trends-parameter', 'value'),
+    Input('trends-parameters', 'value'),
     Input('trends-hour', 'value')
     )
     def update_hourly_avg(location, parameter, selected_hour):
@@ -403,6 +481,16 @@ def register_callbacks(dash_app, colors):
         # Normalize marker size
         max_count = agg_df['count'].max()
         agg_df['size'] = agg_df['count'] / max_count * 40 + 10  # Scale 10–50 px
+
+        # --- Calculate mean from last 5 runs for threshold line ---
+        if 'run_no' in df.columns:
+            recent_runs = sorted(df['run_no'].unique())[-5:]
+            recent_df = df[df['run_no'].isin(recent_runs)]
+        else:
+            recent_df = df
+
+        mean_threshold = recent_df[param].mean()
+
 
         fig = go.Figure(data=go.Scatter(
             x=agg_df['x'],

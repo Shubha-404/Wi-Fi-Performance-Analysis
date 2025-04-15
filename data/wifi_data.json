@@ -149,6 +149,21 @@
             "jitter_ms": 0.0,
             "packet_loss": 0.0,
             "rssi": 99
+        },
+        {
+            "timestamp": "2025-04-15 17:57:36",
+            "run_no": 3,
+            "location": {
+                "position[x]": 67.12,
+                "position[y]": -43.45,
+                "position[name]": "ECC"
+            },
+            "download_speed": 161.6123699772232,
+            "upload_speed": 47.68000547695803,
+            "latency_ms": 46.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
         }
     ],
     "GEC": [
@@ -271,6 +286,21 @@
             "jitter_ms": 0.0,
             "packet_loss": 0.0,
             "rssi": 99
+        },
+        {
+            "timestamp": "2025-04-15 17:58:24",
+            "run_no": 3,
+            "location": {
+                "position[x]": 70.21,
+                "position[y]": -40.31,
+                "position[name]": "GEC"
+            },
+            "download_speed": 191.9263863854301,
+            "upload_speed": 50.31085384771824,
+            "latency_ms": 50.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
         }
     ],
     "SDB": [
@@ -378,6 +408,21 @@
             "jitter_ms": 0.0,
             "packet_loss": 0.0,
             "rssi": 99
+        },
+        {
+            "timestamp": "2025-04-15 17:59:11",
+            "run_no": 3,
+            "location": {
+                "position[x]": 65.78,
+                "position[y]": -42.5,
+                "position[name]": "SDB"
+            },
+            "download_speed": 199.90771570698794,
+            "upload_speed": 50.07765195242147,
+            "latency_ms": 48.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
         }
     ],
     "FOODCOURT": [
@@ -470,6 +515,21 @@
             "jitter_ms": 0.0,
             "packet_loss": 0.0,
             "rssi": 92
+        },
+        {
+            "timestamp": "2025-04-15 17:59:58",
+            "run_no": 3,
+            "location": {
+                "position[x]": 68.33,
+                "position[y]": -41.25,
+                "position[name]": "FOODCOURT"
+            },
+            "download_speed": 157.71587315424773,
+            "upload_speed": 36.52289664702172,
+            "latency_ms": 69.0,
+            "jitter_ms": 0.0,
+            "packet_loss": 0.0,
+            "rssi": 100
         }
     ],
     "LOUNGE": [

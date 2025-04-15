@@ -7,6 +7,7 @@ import re
 from threading import Event
 from Database.database import get_db_connection
 
+
 stop_event = Event()
 
 # Function to get WiFi RSSI on Windows using netsh
