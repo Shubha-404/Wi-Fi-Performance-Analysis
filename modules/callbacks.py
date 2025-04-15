@@ -203,19 +203,84 @@ def register_callbacks(dash_app, colors):
         elif tab == 'heatmap':
             df = load_wifi_data()
             parameters = ['download_speed', 'upload_speed', 'latency_ms', 'jitter_ms', 'packet_loss', 'rssi']
+
+            # ✅ Move this logic ABOVE the return
+            df['date'] = pd.to_datetime(df['timestamp']).dt.date
+            dates = sorted(df['date'].unique())
+            first_date_data = df[df['date'] == dates[0]]
+            first_date_runs = sorted(first_date_data['run_no'].unique())
+
             return html.Div([
                 html.Div([
-                    html.Div("Select Parameter", className='filter-label'),
-                    dcc.Dropdown(
-                        id='heatmap-param',
-                        options=[{'label': p.replace("_", " ").title(), 'value': p} for p in parameters],
-                        value='rssi',
-                        clearable=False
-                    ),
-                ], style={'maxWidth': '300px', 'marginBottom': '20px'}),
+                    # Parameter
+                    html.Div([
+                        html.Div("Parameter", className='filter-label'),
+                        html.Div([
+                            dbc.Button("◀️", id='prev-heatmap-param', color='primary', outline=True, size='sm'),
+                            html.Div(
+                                parameters[0].replace("_", " ").title(),
+                                id='current-heatmap-param-display',
+                                style={
+                                    'padding': '0 15px', 'color': 'white', 'fontWeight': 'bold', 'display': 'inline-block'
+                                }
+                            ),
+                            dbc.Button("▶️", id='next-heatmap-param', color='primary', outline=True, size='sm'),
+                            dcc.Store(id='heatmap-param-index', data=0),
+                            dcc.Input(id='heatmap-param', type='hidden', value=parameters[0])
+                        ], style={'display': 'flex', 'alignItems': 'center'})
+                    ], className='filter-item'),
+
+                    # Date
+                    html.Div([
+                        html.Div("Date", className='filter-label'),
+                        html.Div([
+                            dbc.Button("◀️", id='prev-heatmap-date', color='secondary', outline=True, size='sm'),
+                            html.Div(
+                                str(dates[0]) if dates else 'No Date',
+                                id='current-heatmap-date-display',
+                                style={
+                                    'padding': '0 15px', 'color': 'white', 'fontWeight': 'bold', 'display': 'inline-block'
+                                }
+                            ),
+                            dbc.Button("▶️", id='next-heatmap-date', color='secondary', outline=True, size='sm'),
+                            dcc.Store(id='heatmap-date-index', data=0),
+                           dcc.Input(id='heatmap-date', type='hidden', value=str(dates[0]) if dates else '')
+                        ], style={'display': 'flex', 'alignItems': 'center'})
+                    ], className='filter-item'),
+
+                    # Run
+                    html.Div([
+                        html.Div("Run", className='filter-label'),
+                        html.Div([
+                            dbc.Button("◀️", id='prev-heatmap-run', color='info', outline=True, size='sm'),
+                            html.Div(
+                                f"Run {first_date_runs[0]}" if first_date_runs else 'No Run',
+                                id='current-heatmap-run-display',
+                                style={
+                                    'padding': '0 15px', 'color': 'white', 'fontWeight': 'bold', 'display': 'inline-block'
+                                }
+                            ),
+                            dbc.Button("▶️", id='next-heatmap-run', color='info', outline=True, size='sm'),
+                            dcc.Store(id='heatmap-run-index', data=0),
+                           dcc.Input(id='heatmap-run', type='hidden', value=str(first_date_runs[0]) if first_date_runs else '')
+                        ], style={'display': 'flex', 'alignItems': 'center'})
+                    ], className='filter-item')
+                ],
+                style={
+                    'display': 'flex',
+                    'gap': '300px',
+                    'flexWrap': 'wrap',
+                    # 'justifyContent': 'space-between',
+                    'marginBottom': '20px',
+                    'marginLeft': '70px',  
+                }),
 
                 dcc.Graph(id='heatmap-graph', className='graph-container')
-            ])
+            ],style={
+                    'maxWidth': None,   # ✅ same width as the graph
+                    'margin': '0 auto',     # ✅ center the whole block
+                })
+
         elif tab == 'insights':
             return html.Div([
                 html.H3("🧠 AI-based insights will go here.")
@@ -253,7 +318,85 @@ def register_callbacks(dash_app, colors):
         new_location = locations[new_index]
         return new_index, new_location, new_location
         
+    @dash_app.callback(
+        Output('heatmap-param-index', 'data'),
+        Output('current-heatmap-param-display', 'children'),
+        Output('heatmap-param', 'value'),
+        Input('prev-heatmap-param', 'n_clicks'),
+        Input('next-heatmap-param', 'n_clicks'),
+        State('heatmap-param-index', 'data'),
+        prevent_initial_call=True
+    )
+    def switch_param(prev_clicks, next_clicks, current_index):
+        ctx = dash.callback_context
+        parameters = ['download_speed', 'upload_speed', 'latency_ms', 'jitter_ms', 'packet_loss', 'rssi']
+        if not ctx.triggered:
+            return current_index, dash.no_update, dash.no_update
+
+        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        if triggered_id == 'prev-heatmap-param':
+            new_index = (current_index - 1) % len(parameters)
+        else:
+            new_index = (current_index + 1) % len(parameters)
+
+        new_param = parameters[new_index]
+        return new_index, new_param.replace("_", " ").title(), new_param
     
+    @dash_app.callback(
+        Output('heatmap-date-index', 'data'),
+        Output('current-heatmap-date-display', 'children'),
+        Output('heatmap-date', 'value'),
+        Input('prev-heatmap-date', 'n_clicks'),
+        Input('next-heatmap-date', 'n_clicks'),
+        State('heatmap-date-index', 'data'),
+        prevent_initial_call=True
+    )
+    def switch_date(prev_clicks, next_clicks, current_index):
+        ctx = dash.callback_context
+        df = load_wifi_data()
+        dates = sorted(pd.to_datetime(df['timestamp']).dt.date.unique())
+        if not ctx.triggered:
+            return current_index, dash.no_update, dash.no_update
+
+        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        if triggered_id == 'prev-heatmap-date':
+            new_index = (current_index - 1) % len(dates)
+        else:
+            new_index = (current_index + 1) % len(dates)
+
+        new_date = str(dates[new_index])
+        return new_index, new_date, new_date
+    
+    @dash_app.callback(
+        Output('heatmap-run-index', 'data'),
+        Output('current-heatmap-run-display', 'children'),
+        Output('heatmap-run', 'value'),
+        Input('prev-heatmap-run', 'n_clicks'),
+        Input('next-heatmap-run', 'n_clicks'),
+        State('heatmap-date', 'value'),
+        State('heatmap-run-index', 'data'),
+        prevent_initial_call=True
+    )
+    def switch_run(prev_clicks, next_clicks, selected_date, current_index):
+        ctx = dash.callback_context
+        df = load_wifi_data()
+        df['date'] = pd.to_datetime(df['timestamp']).dt.date
+        if not selected_date:
+            return current_index, dash.no_update, dash.no_update
+
+        run_list = sorted(df[df['date'] == pd.to_datetime(selected_date).date()]['run_no'].unique())
+        if not run_list:
+            return 0, "No runs", None
+
+        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        if triggered_id == 'prev-heatmap-run':
+            new_index = (current_index - 1) % len(run_list)
+        else:
+            new_index = (current_index + 1) % len(run_list)
+
+        new_run = str(run_list[new_index])
+        return new_index, f"Run {new_run}", new_run
+
     @dash_app.callback(
     Output('trends-time-series', 'figure'),
     Input('trends-location', 'value'),
@@ -291,7 +434,7 @@ def register_callbacks(dash_app, colors):
             )
             fig.update_traces(marker=dict(size=20))
             fig.update_layout(
-                height=500,
+                height=400,
                 width=None,
                 plot_bgcolor='white',
                 paper_bgcolor='white',
@@ -318,7 +461,7 @@ def register_callbacks(dash_app, colors):
                 xaxis_title=parameter_labels[parameters[0]],
                 yaxis_title=parameter_labels[parameters[1]],
                 width=None,
-                height=500
+                height=400
             )
 
         else:
@@ -453,12 +596,21 @@ def register_callbacks(dash_app, colors):
     
     @dash_app.callback(
     Output('heatmap-graph', 'figure'),
-    Input('heatmap-param', 'value')
+    Input('heatmap-param', 'value'),
+    Input('heatmap-date', 'value'),
+    Input('heatmap-run', 'value')
     )
-    def update_heatmap(param):
+    def update_heatmap(param, selected_date, selected_run):
         df = load_wifi_data()
-        if df.empty:
+        if df.empty or not selected_date or not selected_run:
             return go.Figure()
+
+        # Filter by date and run
+        df['date'] = pd.to_datetime(df['timestamp']).dt.date
+        df = df[(df['date'] == pd.to_datetime(selected_date).date()) &
+                (df['run_no'] == int(selected_run))]
+
+
 
         # Group by location to get averages + count
         agg_df = df.groupby('location').agg({
@@ -522,7 +674,7 @@ def register_callbacks(dash_app, colors):
             xaxis=dict(title="X", showgrid=False, zeroline=False),
             yaxis=dict(title="Y", showgrid=False, zeroline=False),
             plot_bgcolor='white',
-            height=600
+            height=400
         )
 
         return fig
@@ -570,7 +722,7 @@ def register_callbacks(dash_app, colors):
             paper_bgcolor='white',
             font=dict(color=colors['text']),
             margin=dict(l=60, r=20, t=50, b=50),
-            height=500
+            height=400
         )
 
         return fig
