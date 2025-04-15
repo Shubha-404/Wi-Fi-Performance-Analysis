@@ -23,24 +23,33 @@ def showdata():
     except Exception as e:
         return jsonify({"error": str(e)})
 
+@proj.route('/collection/status')
+def collection_status():
+    is_running = collection_thread and collection_thread.is_alive()
+    return {'status': is_running}
 
-# ✅ Combined Start/Stop UI + Logic Route
+
+#Combined Start/Stop UI + Logic Route
 @proj.route('/collection', methods=['GET', 'POST'])
 def collection():
     global collection_thread
     message = ""
+    status = False
 
     if request.method == 'POST':
         action = request.form.get('action')
         if action == 'start':
             if collection_thread and collection_thread.is_alive():
+                status = True
                 message = "⚠️ Data collection is already running!"
             else:
                 stop_event.clear()
-                loc = [['ECC', 67.12, -43.45], ['GEC', 70.21, -40.31], ['SDB', 65.78, -42.5],
-                       ['FOODCOURT', 68.33, -41.25], ['LOUNGE', 69.0, -39.9]]
+                # loc = [['ECC', 67.12, -43.45], ['GEC', 70.21, -40.31], ['SDB', 65.78, -42.5],
+                #        ['FOODCOURT', 68.33, -41.25], ['LOUNGE', 69.0, -39.9]]
+                loc = [['ECC', 67.12, -43.45]]
                 collection_thread = Thread(target=start_collection, args=(loc,))
                 collection_thread.start()
+                status = True
                 message = "🚀 Data Collection Started"
         elif action == 'stop':
             stop_collection()
@@ -50,8 +59,14 @@ def collection():
             else:
                 message = "⚠️ No active data collection to stop"
 
-    # Simple inline HTML for the buttons and message
-    return render_template("collection.html", message=message)
+    # ✅ Check if thread is still alive after the POST request logic
+    if collection_thread and collection_thread.is_alive():
+        status = True
+    else:
+        status = False
+
+    return render_template("collection.html", message=message, status=status)
+
 
 # Run app
 if __name__ == "__main__":

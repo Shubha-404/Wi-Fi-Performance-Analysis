@@ -130,6 +130,8 @@ def collect_and_store_data(location_list, run_no):
 
         location_name, position_x, position_y = location
 
+        print(f"[Run {run_no}] getting Data for {location_name}...")
+
         download_speed, upload_speed = get_speed()
         latency, jitter, packet_loss = get_ping_stats()
         rssi = get_rssi()
@@ -155,8 +157,10 @@ def collect_and_store_data(location_list, run_no):
 
             store_data_in_db(location_name, position_x, position_y, data)
             print(f"[Run {run_no}] Data saved at {timestamp} for {location_name}")
-
+        else:
+            print(f"[Run {run_no}] Data can't be saved at {timestamp} for {location_name}")
         time.sleep(5)
+    print(f"[Run {run_no}] Data collection is Completed.")
 
 
 def get_next_run_no():
@@ -181,9 +185,9 @@ def get_next_run_no():
 
 def start_collection(location_list):
     run_no = get_next_run_no()
-    print(f"Starting data collection for Run {run_no} across {len(location_list)} locations.")
+    print(f"Starting data collection for Run {run_no} across {len(location_list)} locations...")
     collect_and_store_data(location_list, run_no)
-
+    return True
 
 def stop_collection():
     stop_event.set()

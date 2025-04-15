@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>WiFi Data Collection</title>
+    
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -31,29 +32,29 @@
 
         button {
             padding: 12px 30px;
-            margin: 10px;
             font-size: 16px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease-in-out;
+            width: 100%;
         }
 
-        button[name="action"][value="start"] {
+        .start {
             background-color: #28a745;
             color: white;
         }
 
-        button[name="action"][value="start"]:hover {
+        .start:hover {
             background-color: #218838;
         }
 
-        button[name="action"][value="stop"] {
+        .stop {
             background-color: #dc3545;
             color: white;
         }
 
-        button[name="action"][value="stop"]:hover {
+        .stop:hover {
             background-color: #c82333;
         }
 
@@ -65,10 +66,41 @@
     </style>
 </head>
 <body>
+    <script>
+        async function checkStatus() {
+            try {
+                const res = await fetch('/collection/status');
+                const data = await res.json();
+    
+                const form = document.querySelector("form");
+                const msgDiv = document.querySelector(".msg");
+    
+                if (data.status) {
+                    form.innerHTML = `<button name="action" value="stop" class="stop">Stop Collection</button>`;
+                    msgDiv.innerText = "✅ Collection is running";
+                } else {
+                    form.innerHTML = `<button name="action" value="start" class="start">Start Collection</button>`;
+                    msgDiv.innerText = "⏹️ Collection is stopped";
+                }
+            } catch (err) {
+                console.error("Error fetching status:", err);
+            }
+        }
+    
+        // Check status every 3 seconds
+        setInterval(checkStatus, 3000);
+    
+        // Initial call
+        checkStatus();
+    </script>
+    
     <h2>WiFi Data Collection Control</h2>
     <form method="POST">
-        <button name="action" value="start">Start Collection</button>
-        <button name="action" value="stop">Stop Collection</button>
+        {% if status %}
+            <button name="action" value="stop" class="stop">Stop Collection</button>
+        {% else %}
+            <button name="action" value="start" class="start">Start Collection</button>
+        {% endif %}
     </form>
     {% if message %}
         <div class="msg">{{ message }}</div>
