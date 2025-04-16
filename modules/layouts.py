@@ -5,7 +5,6 @@ def serve_layout(colors, locations, dates, hours):
         dcc.Location(id='url', refresh=False),
         dcc.Store(id='collection-state', data={'active': False}),
 
-
         # 📍 Top-right Start/Stop Button
         html.Div([
             html.Button("Start", id='data-toggle-btn', n_clicks=0, className='small-btn'),
