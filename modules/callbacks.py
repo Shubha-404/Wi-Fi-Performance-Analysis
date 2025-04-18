@@ -151,30 +151,30 @@ def register_callbacks(dash_app, colors):
                         )
                     ], className='filter-item'),
 
-                    html.Div([
-                        html.Div("Smoothing", className='filter-label'),
-                        dcc.Checklist(
-                            id='smoothing-toggle',
-                            options=[{'label': '3-run Moving Avg', 'value': 'smooth'}],
-                            value=[],
-                            inputStyle={'marginRight': '10px'},
-                            style={'color': 'white'}
-                        )
-                    ], className='filter-item'),
+                    # html.Div([
+                    #     html.Div("Smoothing", className='filter-label'),
+                    #     dcc.Checklist(
+                    #         id='smoothing-toggle',
+                    #         options=[{'label': '3-run Moving Avg', 'value': 'smooth'}],
+                    #         value=[],
+                    #         inputStyle={'marginRight': '10px'},
+                    #         style={'color': 'white'}
+                    #     )
+                    # ], className='filter-item'),
 
-                    html.Div([
-                        html.Div("Aggregation Level", className='filter-label'),
-                        dcc.Dropdown(
-                            id='aggregation-level',
-                            options=[
-                                {'label': 'Raw', 'value': 'raw'},
-                                {'label': 'Per Run', 'value': 'run'},
-                                {'label': 'Per Day', 'value': 'day'}
-                            ],
-                            value='raw',
-                            clearable=False
-                        )
-                    ], className='filter-item'),
+                    # html.Div([
+                    #     html.Div("Aggregation Level", className='filter-label'),
+                    #     dcc.Dropdown(
+                    #         id='aggregation-level',
+                    #         options=[
+                    #             {'label': 'Raw', 'value': 'raw'},
+                    #             {'label': 'Per Run', 'value': 'run'},
+                    #             {'label': 'Per Day', 'value': 'day'}
+                    #         ],
+                    #         value='raw',
+                    #         clearable=False
+                    #     )
+                    # ], className='filter-item'),
 
                     html.Div([
                         html.Div("Hour Range", className='filter-label'),
@@ -234,19 +234,38 @@ def register_callbacks(dash_app, colors):
                     html.Div([
                         html.Div("Date", className='filter-label'),
                         html.Div([
-                            dbc.Button("◀️", id='prev-heatmap-date', color='secondary', outline=True, size='sm'),
-                            html.Div(
-                                str(dates[0]) if dates else 'No Date',
-                                id='current-heatmap-date-display',
-                                style={
-                                    'padding': '0 15px', 'color': 'white', 'fontWeight': 'bold', 'display': 'inline-block'
-                                }
-                            ),
-                            dbc.Button("▶️", id='next-heatmap-date', color='secondary', outline=True, size='sm'),
-                            dcc.Store(id='heatmap-date-index', data=0),
-                           dcc.Input(id='heatmap-date', type='hidden', value=str(dates[0]) if dates else '')
-                        ], style={'display': 'flex', 'alignItems': 'center'})
+                        dbc.Button("◀️", id='prev-heatmap-date', color='secondary', outline=True, size='sm'),
+
+                        # ✅ Replace static text with the calendar, styled like a label
+                        dcc.DatePickerSingle(
+                            id='heatmap-date-picker',
+                            date=dates[0],
+                            display_format='YYYY-MM-DD',
+                            style={
+                                'backgroundColor': '#1f2c3e',
+                                'color': 'white',
+                                'border': '1px solid #ccc',
+                                'borderRadius': '5px',
+                                'padding': '5px 10px',
+                                'margin': '0 10px',
+                                'textAlign': 'center',
+                                'fontWeight': 'bold',
+                                'cursor': 'pointer'
+                            },
+                            className='custom-date-picker',
+                            min_date_allowed=dates[0],
+                            max_date_allowed=dates[-1],
+                            disabled_days=[d for d in pd.date_range(start=dates[0], end=dates[-1]) if d.date() not in dates]
+),
+
+
+                        dbc.Button("▶️", id='next-heatmap-date', color='secondary', outline=True, size='sm'),
+
+                        dcc.Store(id='heatmap-date-index', data=0),
+                        dcc.Input(id='heatmap-date', type='hidden', value=str(dates[0]) if dates else '')
+                    ], style={'display': 'flex', 'alignItems': 'center'})
                     ], className='filter-item'),
+
 
                     # Run
                     html.Div([
@@ -342,57 +361,67 @@ def register_callbacks(dash_app, colors):
         new_param = parameters[new_index]
         return new_index, new_param.replace("_", " ").title(), new_param
     
+    # @dash_app.callback(
+    #     Output('heatmap-date-index', 'data'),
+    #     Output('current-heatmap-date-display', 'children'),
+    #     Output('heatmap-date', 'value'),
+    #     Input('prev-heatmap-date', 'n_clicks'),
+    #     Input('next-heatmap-date', 'n_clicks'),
+    #     State('heatmap-date-index', 'data'),
+    #     prevent_initial_call=True
+    # )
+    # def switch_date(prev_clicks, next_clicks, current_index):
+    #     ctx = dash.callback_context
+    #     df = load_wifi_data()
+    #     dates = sorted(pd.to_datetime(df['timestamp']).dt.date.unique())
+    #     if not ctx.triggered:
+    #         return current_index, dash.no_update, dash.no_update
+
+    #     triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    #     if triggered_id == 'prev-heatmap-date':
+    #         new_index = (current_index - 1) % len(dates)
+    #     else:
+    #         new_index = (current_index + 1) % len(dates)
+
+    #     new_date = str(dates[new_index])
+    #     return new_index, new_date, new_date
+    
     @dash_app.callback(
-        Output('heatmap-date-index', 'data'),
-        Output('current-heatmap-date-display', 'children'),
-        Output('heatmap-date', 'value'),
-        Input('prev-heatmap-date', 'n_clicks'),
-        Input('next-heatmap-date', 'n_clicks'),
-        State('heatmap-date-index', 'data'),
-        prevent_initial_call=True
+    Output('heatmap-run-index', 'data'),
+    Output('current-heatmap-run-display', 'children'),
+    Output('heatmap-run', 'value'),
+    Input('prev-heatmap-run', 'n_clicks'),
+    Input('next-heatmap-run', 'n_clicks'),
+    Input('heatmap-date', 'value'),  # 🎯 also triggered when date changes
+    State('heatmap-run-index', 'data'),
+    prevent_initial_call=True
     )
-    def switch_date(prev_clicks, next_clicks, current_index):
+    def switch_or_reset_run(prev_clicks, next_clicks, selected_date, current_index):
         ctx = dash.callback_context
+        if not selected_date:
+            return current_index, dash.no_update, dash.no_update
+
         df = load_wifi_data()
-        dates = sorted(pd.to_datetime(df['timestamp']).dt.date.unique())
+        df['date'] = pd.to_datetime(df['timestamp']).dt.date
+        selected_date_obj = pd.to_datetime(selected_date).date()
+        run_list = sorted(df[df['date'] == selected_date_obj]['run_no'].unique())
+
+        if not run_list:
+            return 0, "No runs", ''
+
+        # Check what triggered the callback
         if not ctx.triggered:
             return current_index, dash.no_update, dash.no_update
 
         triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
-        if triggered_id == 'prev-heatmap-date':
-            new_index = (current_index - 1) % len(dates)
-        else:
-            new_index = (current_index + 1) % len(dates)
 
-        new_date = str(dates[new_index])
-        return new_index, new_date, new_date
-    
-    @dash_app.callback(
-        Output('heatmap-run-index', 'data'),
-        Output('current-heatmap-run-display', 'children'),
-        Output('heatmap-run', 'value'),
-        Input('prev-heatmap-run', 'n_clicks'),
-        Input('next-heatmap-run', 'n_clicks'),
-        State('heatmap-date', 'value'),
-        State('heatmap-run-index', 'data'),
-        prevent_initial_call=True
-    )
-    def switch_run(prev_clicks, next_clicks, selected_date, current_index):
-        ctx = dash.callback_context
-        df = load_wifi_data()
-        df['date'] = pd.to_datetime(df['timestamp']).dt.date
-        if not selected_date:
-            return current_index, dash.no_update, dash.no_update
-
-        run_list = sorted(df[df['date'] == pd.to_datetime(selected_date).date()]['run_no'].unique())
-        if not run_list:
-            return 0, "No runs", None
-
-        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
         if triggered_id == 'prev-heatmap-run':
             new_index = (current_index - 1) % len(run_list)
-        else:
+        elif triggered_id == 'next-heatmap-run':
             new_index = (current_index + 1) % len(run_list)
+        else:
+            # triggered by date change → reset to first run
+            new_index = 0
 
         new_run = str(run_list[new_index])
         return new_index, f"Run {new_run}", new_run
@@ -401,132 +430,87 @@ def register_callbacks(dash_app, colors):
     Output('trends-time-series', 'figure'),
     Input('trends-location', 'value'),
     Input('trends-parameters', 'value'),
-    Input('trends-hour', 'value'),
-    Input('smoothing-toggle', 'value'),
-    Input('aggregation-level', 'value')
-
-)
-    def update_trend_timeseries(location, parameters, selected_hour, smoothing_toggle, aggregation_level):
+    Input('trends-hour', 'value')
+    )
+    def update_trend_timeseries(location, parameters, selected_hour, colors=colors):
         df = load_wifi_data()
-        if df.empty or not location:
-            return {}
+        if df.empty or not location or not parameters:
+            return go.Figure()
 
         df['hour'] = pd.to_datetime(df['timestamp']).dt.hour.astype(int)
-        filtered = df[df['location'] == location]
+        df['date'] = pd.to_datetime(df['timestamp']).dt.date
+        df['run_label'] = df.apply(lambda row: f"{row['date']} | Run {row['run_no']}", axis=1)
 
-        # Filter by hour range
+        filtered_df = df[df['location'] == location]
         if selected_hour and isinstance(selected_hour, list) and len(selected_hour) == 2:
-            filtered = filtered[
-                (filtered['hour'] >= selected_hour[0]) & (filtered['hour'] <= selected_hour[1])
-            ]
+            filtered_df = filtered_df[(filtered_df['hour'] >= selected_hour[0]) & (filtered_df['hour'] <= selected_hour[1])]
 
-        # === Visualization ===
-        if len(parameters) == 1:
-            # One parameter: time vs value (scatter)
-            fig = px.scatter(
-                filtered,
-                x='timestamp',
-                y=parameters[0],
-                color='run_no' if 'run_no' in filtered.columns else None,
-                title=f"{parameter_labels[parameters[0]]} Over Time - {location}",
-                hover_data=['timestamp', 'hour'] if 'hour' in filtered.columns else ['timestamp'],
-                labels={'run_no': 'Run'} if 'run_no' in filtered.columns else {}
+        all_runs = df[['run_label']].drop_duplicates().sort_values('run_label')
+        fig = go.Figure()
+
+        for param in parameters:
+            global_min = df[param].min()
+            global_max = df[param].max()
+            if global_min == global_max:
+                global_min -= 1
+                global_max += 1
+
+            param_avg = filtered_df[['run_label', param]].groupby('run_label').mean().reset_index()
+            merged = all_runs.merge(param_avg, on='run_label', how='left')
+
+            merged['normalized'] = merged[param].apply(
+                lambda x: (x - global_min) / (global_max - global_min) if pd.notna(x) else None
             )
-            fig.update_traces(marker=dict(size=20))
-            fig.update_layout(
-                height=400,
-                width=None,
-                plot_bgcolor='white',
-                paper_bgcolor='white',
-                font={'color': colors['text']},
-                margin=dict(l=60, r=20, t=50, b=50),
-                xaxis_tickangle=-45
+            merged['normalized'] = merged.apply(
+                lambda row: 0.0001 if row[param] == 0 else row['normalized'], axis=1
             )
 
-        elif len(parameters) == 2:
-            # 2-param comparison as line graph
-            fig = go.Figure()
-            
-            # Add a trace for the first parameter
-            fig.add_trace(go.Scatter(
-                x=filtered[parameters[0]],
-                y=filtered[parameters[1]],
-                mode='lines',  # Use 'lines' for a line graph without markers
-                name=f"{parameter_labels[parameters[0]]} vs {parameter_labels[parameters[1]]}",
-                line=dict(width=2)  # Customize line width if needed
-            ))
-            
-            fig.update_layout(
-                title=f"Comparison: {parameter_labels[parameters[0]]} vs {parameter_labels[parameters[1]]}",
-                xaxis_title=parameter_labels[parameters[0]],
-                yaxis_title=parameter_labels[parameters[1]],
-                width=None,
-                height=400
+            unit = parameter_labels[param].split()[-1].strip("()")
+            merged['label'] = merged[param].apply(
+                lambda x: f"{x:.2f} {unit}" if pd.notna(x) else "No data"
             )
 
-        else:
-            # More than two parameters: grouped bar chart + correlation heatmap in subplots
-            latest_runs = sorted(filtered['run_no'].unique())[-5:]
-            filtered_runs = filtered[filtered['run_no'].isin(latest_runs)]
+            colors_list = []
+            line_colors = []
+            for val in merged[param]:
+                if pd.isna(val):
+                    colors_list.append('rgba(0,0,0,0)')
+                    line_colors.append('black')
+                else:
+                    colors_list.append(colors.get(param, 'gray'))
+                    line_colors.append(colors.get(param, 'gray'))
 
-            # Compute correlation
-            corr_data = filtered_runs[parameters]
-            corr_matrix = corr_data.corr()
-
-            # Create subplot with 2 rows
-            fig = make_subplots(
-                rows=2, cols=1,
-                shared_xaxes=False,
-                subplot_titles=[
-                    f"Grouped Bar Chart (Last 5 Runs) - {location}",
-                    "Correlation Heatmap"
-                ],
-                row_heights=[0.5, 0.5],
-                vertical_spacing=0.15
-            )
-
-            # Add bar traces
-            for param in parameters:
-                fig.add_trace(go.Bar(
-                    x=['Run ' + str(r) for r in filtered_runs['run_no']],
-                    y=filtered_runs[param],
-                    name=parameter_labels[param]
-                ), row=1, col=1)
-
-            # Add heatmap
-            fig.add_trace(go.Heatmap(
-                z=corr_matrix.values,
-                x=[parameter_labels[p] for p in parameters],
-                y=[parameter_labels[p] for p in parameters],
-                colorscale='Viridis',
-                colorbar=dict(title='Correlation')
-            ), row=2, col=1)
-
-            fig.update_layout(
-                height=800,
-                width=None,
-                barmode='group',
-                plot_bgcolor='white',
-                paper_bgcolor='white',
-                font={'color': colors['text']},
-                margin=dict(l=60, r=20, t=50, b=50),
-                xaxis_tickangle=-45,
-                showlegend=True,
-
-                # 🔥 Fix legend and colorbar position
-                legend=dict(
-                    orientation='h',
-                    yanchor='bottom',
-                    y=1.05,
-                    xanchor='center',
-                    x=0.5
+            fig.add_trace(go.Bar(
+                x=merged['run_label'],
+                y=merged['normalized'].fillna(0.01),
+                name=parameter_labels[param],
+                text=merged['label'],
+                textposition='auto',
+                hovertemplate=(
+                    f"<b>{parameter_labels[param]}</b><br>" +
+                    "Run: %{x}<br>" +
+                    "Normalized: %{y:.2f}<br>" +
+                    "Value: %{text}<extra></extra>"
                 ),
-                coloraxis_colorbar=dict(
-                    x=1.02  # pushes color scale slightly to the right
+                marker=dict(
+                    color=colors_list,
+                    line=dict(color=line_colors, width=2)
                 )
-            )
+            ))
 
-        # For 1 or 2 parameters, return a single figure
+        fig.update_layout(
+            title=f"Normalized Parameter Comparison - {location}",
+            barmode='group',
+            plot_bgcolor='white',
+            paper_bgcolor='white',
+            font=dict(color=colors.get('text', 'black')),
+            margin=dict(l=60, r=20, t=50, b=50),
+            xaxis=dict(tickangle=-45),
+            yaxis=dict(range=[0, 1], visible=False),  # ✅ Fix here
+            showlegend=True
+        )
+
+
         return fig
 
     @dash_app.callback(
@@ -652,7 +636,16 @@ def register_callbacks(dash_app, colors):
                 size=agg_df['size'],
                 color=agg_df[param],
                 colorscale='Viridis',
-                colorbar=dict(title=param.replace('_', ' ').title()),
+                colorbar=dict(
+                    title=dict(
+                        text=param.replace('_', ' ').title(),
+                        side='right'
+                    ),
+                    len=1,
+                    thickness=20,       # ✅ set consistent width
+                    xpad=10   ,          # ✅ space between plot and bar
+                    tickformat="0.1f"  # ✅ always 1 digit after decimal
+                ),
                 showscale=True,
                 line=dict(width=1, color='black')
             ),
@@ -671,13 +664,64 @@ def register_callbacks(dash_app, colors):
 
         fig.update_layout(
             title=f"📍 Average {param.replace('_', ' ').title()} Across Locations",
-            xaxis=dict(title="X", showgrid=False, zeroline=False),
-            yaxis=dict(title="Y", showgrid=False, zeroline=False),
+            xaxis=dict(
+                title="X",
+                showgrid=False,
+                zeroline=False,
+                range=[0, 550]  # ✅ Set fixed X axis range here (adjust as needed)
+            ),
+            yaxis=dict(
+                title="Y",
+                showgrid=False,
+                zeroline=False,
+                range=[0, 350]  # ✅ Set fixed Y axis range here (adjust as needed)
+            ),
             plot_bgcolor='white',
-            height=400
+            height=400,
+            margin=dict(l=60, r=100, t=50, b=50),  # ✅ r=80 gives space for wide colorbar
+
         )
 
+
         return fig
+
+    @dash_app.callback(
+    Output('heatmap-date', 'value'),
+    Output('heatmap-date-index', 'data'),
+    Output('heatmap-date-picker', 'date'),  
+    Input('prev-heatmap-date', 'n_clicks'),
+    Input('next-heatmap-date', 'n_clicks'),
+    Input('heatmap-date-picker', 'date'),
+    State('heatmap-date-index', 'data'),
+    prevent_initial_call=True
+    )
+    def switch_or_pick_date(prev_clicks, next_clicks, selected_date_from_picker, current_index):
+        ctx = dash.callback_context
+        if not ctx.triggered:
+            return dash.no_update, dash.no_update, dash.no_update
+
+        df = load_wifi_data()
+        dates = sorted(pd.to_datetime(df['timestamp']).dt.date.unique())
+
+        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+        if triggered_id == 'prev-heatmap-date':
+            new_index = (current_index - 1) % len(dates)
+            new_date = str(dates[new_index])
+            return new_date, new_index, new_date
+
+        elif triggered_id == 'next-heatmap-date':
+            new_index = (current_index + 1) % len(dates)
+            new_date = str(dates[new_index])
+            return new_date, new_index, new_date
+
+        elif triggered_id == 'heatmap-date-picker':
+            picked_date = pd.to_datetime(selected_date_from_picker).date()
+            if picked_date in dates:
+                new_index = dates.index(picked_date)
+                return str(picked_date), new_index, str(picked_date)
+
+        return dash.no_update, dash.no_update, dash.no_update
 
     @dash_app.callback(
         Output('run-analysis-graph', 'figure'),
@@ -935,3 +979,5 @@ def register_callbacks(dash_app, colors):
         if not options:
             return None
         return options[0]['value']
+
+    
